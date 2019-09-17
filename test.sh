@@ -1,8 +1,8 @@
 #!/bin/bash
 
 MODULE_NAME=srfs
-MOUNT_POINT=/mnt/ramfs
-MODULE_SRC=/mnt/share/ramfs
+MOUNT_POINT=/mnt/srfs
+MODULE_SRC=/root/srfs
 
 # create mount point
 if [[ ! -d "$MOUNT_POINT" ]]; then
@@ -32,3 +32,8 @@ fi
 # reinstall the kernel module
 insmod $MODULE_NAME.ko || exit 1
 mount -t $MODULE_NAME "fan" $MOUNT_POINT || exit 1
+
+# ftruncate test block
+TEST_FILE=$MOUNT_POINT/file1
+touch $TEST_FILE || { echo "touch file $TEST_FILE failed"; exit 1; }
+echo "1234567890" >> $TEST_FILE || { echo "write file $TEST_FILE failed"; exit 1; }

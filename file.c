@@ -3,6 +3,9 @@
 
 #include "ksrfs.h"
 
+int srfs_mmap(struct file* file, struct vm_area_struct* vma);
+
+
 static ssize_t srfs_read(struct file *filp,
 							char __user *buf,
 							size_t len,
@@ -21,6 +24,7 @@ static int srfs_readdir(struct file *filp,
 const struct file_operations srfs_file_ops = {
 	.read = srfs_read,
 	.write = srfs_write,
+	.mmap = srfs_mmap,
 };
 
 const struct file_operations srfs_dir_ops = {
@@ -82,7 +86,7 @@ static ssize_t srfs_read(struct file *filp, char __user *buf,
 
 	/* out of scope */
 	if (si->size < *ppos + 1) {
-		return -EINVAL;
+		return 0;
 	}
 
 	len = (len > (si->size - *ppos))?(si->size - *ppos) : len;
@@ -160,6 +164,9 @@ static ssize_t srfs_write(struct file *filp, const char __user *buf,
 		return ret;
 	}
 
+	
+	printk(KERN_INFO "srfs_write: offset=%llu, len=%lu\n", *ppos, len);
+	
 	if (GET_GROUP_INDEX(inode->i_ino) != 0) {
 		printk(KERN_INFO "gourp id =%lu\n", GET_GROUP_INDEX(inode->i_ino));
 		return -EINVAL;
@@ -213,7 +220,6 @@ static ssize_t srfs_write(struct file *filp, const char __user *buf,
 			copy_bytes -= ret;
 		}
 
-		si->size += copy_bytes;
 		left -= copy_bytes;
 		if (left <= 0) {
 			break;
@@ -233,6 +239,8 @@ static ssize_t srfs_write(struct file *filp, const char __user *buf,
 	}
 
 	if (len > left) {
+		si->size = max(si->size, *ppos + len - left);
+		inode->i_size = si->size;
 		return len - left;
 	}
 
@@ -289,4 +297,11 @@ static int srfs_readdir(struct file *filp, void *dirent, filldir_t filldir)
 
 	return 0;
 }
+
+int srfs_mmap(struct file* file, struct vm_area_struct* vma)
+{
+	printk(KERN_INFO "srfs_mmap <--\n");
+	return -EINVAL;
+}
+
 

@@ -199,6 +199,15 @@ static struct inode *srfs_alloc_inode(struct super_block *sb)
 	si->size = 0;
 	INIT_LIST_HEAD(&si->data);
 
+	/*
+	 * The vfs inode is part of the srfs_inode_info, so its memory allocation is the responsibility of 
+	 * srfs_inode_info allocator. 
+	 * inode_init_once is invoked normally by kmem_cache_allocator, 
+	 * but in this module kmem_cache_allocator is replaced by fixed size memory,
+	 * therefore, it's necessary to invoke this init once procedure here for alternative.
+	*/
+	inode_init_once(&si->vfs_inode);
+
 	return &si->vfs_inode;
 }
 
