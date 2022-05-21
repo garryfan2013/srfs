@@ -4,25 +4,23 @@
 #include "ksrfs.h"
 
 struct srfs_block_info *srfs_alloc_block(struct super_block *sb,
-												struct inode *inode);
-
+					struct inode *inode);
 
 static int srfs_create(struct inode *dir,
-							struct dentry *dentry,
-							umode_t mode, bool excl);
-
+			struct dentry *dentry,
+			umode_t mode, 
+			bool excl);
 
 static int srfs_mkdir(struct inode *dir, 
-							struct dentry *dentry,
-							umode_t mode);
+			struct dentry *dentry,
+			umode_t mode);
 
 static struct dentry *srfs_lookup(struct inode *dir,
-										struct dentry *dentry,
-										unsigned int flags);
+					struct dentry *dentry,
+					unsigned int flags);
 
 extern const struct file_operations srfs_file_ops;
 extern const struct file_operations srfs_dir_ops;
-
 
 const struct inode_operations srfs_inode_ops = {
 	.create = srfs_create,
@@ -76,8 +74,8 @@ void srfs_fill_inode(struct inode *inode)
 }
 
 int srfs_dir_add_entry(struct inode *dir,
-										char *name,
-										struct inode *ino)
+			char *name,
+			struct inode *ino)
 {
 	struct srfs_inode_info *parent_si;
 	uint64_t ent_size;
@@ -124,8 +122,8 @@ int srfs_dir_add_entry(struct inode *dir,
 }
 
 static struct dentry *srfs_dir_find_entry(struct inode *dir, 
-											struct dentry *dentry, 
-											unsigned int flags)
+						struct dentry *dentry, 
+						unsigned int flags)
 {
 	struct srfs_inode_info *si;
 	struct srfs_block_info *bi;
@@ -160,8 +158,8 @@ static struct dentry *srfs_dir_find_entry(struct inode *dir,
 }
 
 static int __srfs_create_inode(struct inode *dir,
-										struct dentry *dentry,
-										umode_t mode)
+				struct dentry *dentry,
+				umode_t mode)
 {
 	struct super_block *sb;
 	struct srfs_sb_info *sbi;
@@ -192,16 +190,16 @@ failed:
 }
 
 static int srfs_create(struct inode *dir,
-							struct dentry *dentry,
-							umode_t mode, bool excl)
+			struct dentry *dentry,
+			umode_t mode, bool excl)
 {
 	printk("%s <--\n", __func__);
 	return __srfs_create_inode(dir, dentry, mode);
 }
 
 static int srfs_mkdir(struct inode *dir,
-							struct dentry *dentry,
-							umode_t mode)
+			struct dentry *dentry,
+			umode_t mode)
 {
 	int ret;
 	struct inode *inode;
@@ -233,8 +231,8 @@ static int srfs_mkdir(struct inode *dir,
 }
 
 static struct dentry *srfs_lookup(struct inode *dir,
-								struct dentry *dentry,
-								unsigned int flags)
+					struct dentry *dentry,
+					unsigned int flags)
 {
 	printk("%s <--\n", __func__);
 	return srfs_dir_find_entry(dir, dentry, flags);
